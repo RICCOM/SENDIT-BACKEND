@@ -21,7 +21,7 @@ psycopg2-binary = "*"
 sqlalchemy-serializer = "*"
 sqlalchemy = "*"
 flask-cors = "*"
-
+gunicorn = "*"
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
