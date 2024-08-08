@@ -5,14 +5,16 @@ from flask_cors import CORS, cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Parcel, Admin, DeliveryHistory, Notification, ParcelType, Driver
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes by default
 
 # Configurations for SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///sendit.db')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///sendit.db')
+app.json.compact = False
 
 # Initialize extensions
 db.init_app(app)
