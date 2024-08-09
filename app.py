@@ -8,7 +8,11 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes by default
+CORS(app, resources={r"/*": {"origins": "https://sendit-phi.vercel.app/"}}) # Enable CORS to a specific origin
+@app.route('/api/data', methods=['GET'])
+def get_data():
+    return {'message': 'Hello, World!'}  
+
 from flask_swagger_ui import get_swaggerui_blueprint
 
 SWAGGER_URL="/swagger"
