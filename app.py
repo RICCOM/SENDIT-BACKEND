@@ -3,32 +3,22 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models import db, User, Parcel, Admin, DeliveryHistory, Notification, ParcelType, Driver
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
+
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://sendit-phi.vercel.app/"}}) # Enable CORS to a specific origin
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    return {'message': 'Hello, World!'}  
+CORS(app, resources={r"/*": {"origins": "https://sendit-phi.vercel.app/"}})  # Enable CORS to a specific origin
 
-from flask_swagger_ui import get_swaggerui_blueprint
+# JWT Configuration
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "super-secret-key")
+app.config['JWT_TOKEN_LOCATION'] = ['headers']
+jwt = JWTManager(app)
 
-SWAGGER_URL="/swagger"
-API_URL="/static/swagger.json"
-
-swagger_ui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
-    config={
-        'app_name': 'Access API'
-    }
-)
-app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
-
-# Configurations for SQLite
-
+# Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
@@ -49,8 +39,23 @@ def authenticate_user(username, password):
 def home():
     return "<h1>SendIT Courier Service</h1>"
 
+@app.route('/users/login', methods=['POST'])
+@cross_origin()
+def user_login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    user = authenticate_user(username, password)
+    
+    if user:
+        access_token = create_access_token(identity=user.id)
+        return jsonify({'access_token': access_token}), 200
+    
+    return jsonify({'message': 'Invalid username or password'}), 401
+
 @app.route('/users', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()
 def users():
     if request.method == 'GET':
         users = User.query.all()
@@ -71,6 +76,7 @@ def users():
 
 @app.route('/users/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @cross_origin()
+@jwt_required()
 def user_detail(id):
     user = User.query.get_or_404(id)
     if request.method == 'GET':
@@ -94,19 +100,9 @@ def user_detail(id):
         db.session.commit()
         return '', 204
 
-@app.route('/users/login', methods=['POST'])
-@cross_origin()
-def user_login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    user = authenticate_user(username, password)
-    if user:
-        return jsonify({'message': 'Login successful'}), 200
-    return jsonify({'message': 'Invalid username or password'}), 401
-
 @app.route('/parcels', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()
 def parcels():
     if request.method == 'GET':
         parcels = Parcel.query.all()
@@ -127,6 +123,7 @@ def parcels():
 
 @app.route('/parcels/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @cross_origin()
+@jwt_required()
 def parcel_detail(id):
     parcel = Parcel.query.get_or_404(id)
     if request.method == 'GET':
@@ -154,6 +151,7 @@ def parcel_detail(id):
 
 @app.route('/admins', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()
 def admins():
     if request.method == 'GET':
         admins = Admin.query.all()
@@ -173,6 +171,7 @@ def admins():
 
 @app.route('/admins/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @cross_origin()
+@jwt_required()
 def admin_detail(id):
     admin = Admin.query.get_or_404(id)
     if request.method == 'GET':
@@ -196,6 +195,7 @@ def admin_detail(id):
 
 @app.route('/delivery_histories', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()
 def delivery_histories():
     if request.method == 'GET':
         histories = DeliveryHistory.query.all()
@@ -214,6 +214,7 @@ def delivery_histories():
 
 @app.route('/notifications', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()
 def notifications():
     if request.method == 'GET':
         notifications = Notification.query.all()
@@ -232,6 +233,7 @@ def notifications():
 
 @app.route('/parcel_types', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()
 def parcel_types():
     if request.method == 'GET':
         parcel_types = ParcelType.query.all()
@@ -249,6 +251,7 @@ def parcel_types():
 
 @app.route('/drivers', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()
 def drivers():
     if request.method == 'GET':
         drivers = Driver.query.all()
@@ -269,6 +272,7 @@ def drivers():
 
 @app.route('/drivers/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @cross_origin()
+@jwt_required()
 def driver_detail(id):
     driver = Driver.query.get_or_404(id)
     if request.method == 'GET':
