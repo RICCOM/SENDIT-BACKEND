@@ -32,6 +32,10 @@ def authenticate_user(username, password):
 def home():
     return "<h1>SendIT Courier Service</h1>"
 
+@app.route('/api/data')
+def get_data():
+    return jsonify({"key": "value"})
+
 @app.route('/users', methods=['GET', 'POST'])
 @cross_origin()
 def users():
