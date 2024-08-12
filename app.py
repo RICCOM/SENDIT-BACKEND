@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from models import db, User, Parcel, Admin, DeliveryHistory, Notification, ParcelType, Driver, Contact, Review
 import os
 from dotenv import load_dotenv
+from flask_swagger_ui import get_swaggerui_blueprint
 
 load_dotenv()
 
@@ -22,6 +23,19 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
+
+# Swagger setup
+SWAGGER_URL = '/api/docs'
+API_URL = "/static/swagger.json"
+
+swagger_ui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': 'Access API'
+    }
+)
+app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
 # Utility Functions
 def authenticate_user(username, password):
@@ -221,6 +235,7 @@ def get_notifications():
 
     notifications = Notification.query.filter_by(user_id=user.id).all()
     return jsonify([notification.serialize() for notification in notifications]), 200
+
 
 # Run the application
 if __name__ == '__main__':
