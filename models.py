@@ -10,15 +10,17 @@ class User(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(100), nullable=False, unique=True, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), default='user')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     parcels = db.relationship('Parcel', back_populates='user', cascade='all, delete-orphan')
     notifications = db.relationship('Notification', back_populates='user', cascade='all, delete-orphan')
+    reviews = db.relationship('Review', back_populates='user', cascade='all, delete-orphan')
 
-    serialize_rules = ('-parcels.user', '-notifications.user')
+    serialize_rules = ('-parcels.user', '-notifications.user', '-reviews.user')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -31,6 +33,7 @@ class User(db.Model, SerializerMixin):
             'id': self.id,
             'username': self.username,
             'email': self.email,
+            'role': self.role,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
@@ -39,8 +42,8 @@ class Parcel(db.Model, SerializerMixin):
     __tablename__ = 'parcels'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'), index=True)
     weight = db.Column(db.Float, nullable=False)
     pickup_address = db.Column(db.String(255), nullable=False)
     pickup_lat = db.Column(db.Float, nullable=False)
@@ -48,7 +51,7 @@ class Parcel(db.Model, SerializerMixin):
     destination_address = db.Column(db.String(255), nullable=False)
     destination_lat = db.Column(db.Float, nullable=False)
     destination_lng = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(50), nullable=False, index=True)
     present_location = db.Column(db.String(255))
     present_location_lat = db.Column(db.Float)
     present_location_lng = db.Column(db.Float)
@@ -59,8 +62,9 @@ class Parcel(db.Model, SerializerMixin):
     driver = db.relationship('Driver', back_populates='parcels')
     delivery_history = db.relationship('DeliveryHistory', back_populates='parcel', cascade='all, delete-orphan')
     notifications = db.relationship('Notification', back_populates='parcel', cascade='all, delete-orphan')
+    reviews = db.relationship('Review', back_populates='parcel', cascade='all, delete-orphan')
 
-    serialize_rules = ('-user.parcels', '-driver.parcels', '-delivery_history.parcel', '-notifications.parcel')
+    serialize_rules = ('-user.parcels', '-driver.parcels', '-delivery_history.parcel', '-notifications.parcel', '-reviews.parcel')
 
     def serialize(self):
         return {
@@ -87,7 +91,7 @@ class Admin(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(100), nullable=False, unique=True, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -111,8 +115,8 @@ class DeliveryHistory(db.Model, SerializerMixin):
     __tablename__ = 'delivery_history'
 
     id = db.Column(db.Integer, primary_key=True)
-    parcel_id = db.Column(db.Integer, db.ForeignKey('parcels.id'), nullable=False)
-    status = db.Column(db.String(50), nullable=False)
+    parcel_id = db.Column(db.Integer, db.ForeignKey('parcels.id'), nullable=False, index=True)
+    status = db.Column(db.String(50), nullable=False, index=True)
     location = db.Column(db.String(255), nullable=False)
     location_lat = db.Column(db.Float, nullable=False)
     location_lng = db.Column(db.Float, nullable=False)
@@ -137,8 +141,8 @@ class Notification(db.Model, SerializerMixin):
     __tablename__ = 'notifications'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    parcel_id = db.Column(db.Integer, db.ForeignKey('parcels.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    parcel_id = db.Column(db.Integer, db.ForeignKey('parcels.id'), nullable=False, index=True)
     message = db.Column(db.String(255), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -188,4 +192,49 @@ class Driver(db.Model, SerializerMixin):
             'id': self.id,
             'name': self.name,
             'phone_number': self.phone_number
+        }
+
+class Contact(db.Model, SerializerMixin):
+    __tablename__ = 'contacts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    subject = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'subject': self.subject,
+            'message': self.message,
+            'created_at': self.created_at.isoformat(),
+        }
+
+class Review(db.Model, SerializerMixin):
+    __tablename__ = 'reviews'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    parcel_id = db.Column(db.Integer, db.ForeignKey('parcels.id'), nullable=False, index=True)
+    rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', back_populates='reviews')
+    parcel = db.relationship('Parcel', back_populates='reviews')
+
+    serialize_rules = ('-user.reviews', '-parcel.reviews')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'parcel_id': self.parcel_id,
+            'rating': self.rating,
+            'comment': self.comment,
+            'created_at': self.created_at.isoformat()
         }

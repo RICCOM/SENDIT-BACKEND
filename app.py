@@ -1,14 +1,12 @@
-# app.py
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from models import db, User, Parcel, Admin, DeliveryHistory, Notification, ParcelType, Driver
+from models import db, User, Parcel, Admin, DeliveryHistory, Notification, ParcelType, Driver, Contact, Review
 import os
 from dotenv import load_dotenv
-from functools import wraps
 
 load_dotenv()
 
@@ -90,14 +88,139 @@ def delivery_histories():
 @cross_origin()
 def user_login():
     data = request.get_json()
-    print(f"Login attempt with data: {data}")  # Debugging statement
     username = data.get('username')
     password = data.get('password')
     user = authenticate_user(username, password)
     if user:
-        access_token = create_access_token(identity={"email": user.email, "role": "user"})
+        access_token = create_access_token(identity={"email": user.email, "role": user.role})
         return jsonify(access_token=access_token), 200
     return jsonify({'message': 'Invalid username or password'}), 401
+
+@app.route('/users/signup', methods=['POST'])
+@cross_origin()
+def user_signup():
+    data = request.get_json()
+    
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    
+    if not all([username, email, password]):
+        return jsonify({'msg': 'All fields are required'}), 400
+
+    # Check if the user already exists
+    if User.query.filter_by(email=email).first():
+        return jsonify({'msg': 'Email already in use'}), 400
+    
+    # Create a new user
+    new_user = User(
+        username=username,
+        email=email,
+        password_hash=generate_password_hash(password)
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'msg': 'User created successfully'}), 201
+
+
+@app.route('/api/revenue', methods=['GET'])
+@cross_origin()
+@jwt_required()
+def get_revenue():
+    # For demonstration purposes, we return static data. Replace with your actual logic.
+    revenue_data = [
+        {"month": "January", "revenue": 12000},
+        {"month": "February", "revenue": 19000},
+        {"month": "March", "revenue": 30000},
+        {"month": "April", "revenue": 50000},
+        {"month": "May", "revenue": 20000},
+        {"month": "June", "revenue": 30000},
+        {"month": "July", "revenue": 70000},
+    ]
+    return jsonify(revenue_data), 200
+
+@app.route('/api/contact', methods=['POST'])
+@cross_origin()
+def submit_contact():
+    data = request.get_json()
+
+    name = data.get('name')
+    email = data.get('email')
+    subject = data.get('subject')
+    message = data.get('message')
+
+    if not all([name, email, subject, message]):
+        return jsonify({'msg': 'All fields are required'}), 400
+
+    new_contact = Contact(
+        name=name,
+        email=email,
+        subject=subject,
+        message=message
+    )
+
+    db.session.add(new_contact)
+    db.session.commit()
+
+    return jsonify({'msg': 'Your message has been received'}), 201
+
+@app.route('/api/reviews', methods=['POST'])
+@cross_origin()
+@jwt_required()
+def submit_review():
+    data = request.get_json()
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    if not user:
+        return jsonify({'msg': 'User not found'}), 404
+
+    parcel_id = data.get('parcel_id')
+    rating = data.get('rating')
+    comment = data.get('comment')
+
+    if not all([parcel_id, rating, comment]):
+        return jsonify({'msg': 'All fields are required'}), 400
+
+    new_review = Review(
+        user_id=user.id,
+        parcel_id=parcel_id,
+        rating=rating,
+        comment=comment
+    )
+
+    db.session.add(new_review)
+    db.session.commit()
+
+    return jsonify(new_review.serialize()), 201
+
+@app.route('/api/parcels', methods=['GET'])
+@cross_origin()
+@jwt_required()
+def get_parcels():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    if not user:
+        return jsonify({'msg': 'User not found'}), 404
+
+    parcels = Parcel.query.filter_by(user_id=user.id).all()
+    return jsonify([parcel.serialize() for parcel in parcels]), 200
+
+@app.route('/api/notifications', methods=['GET'])
+@cross_origin()
+@jwt_required()
+def get_notifications():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    if not user:
+        return jsonify({'msg': 'User not found'}), 404
+
+    notifications = Notification.query.filter_by(user_id=user.id).all()
+    return jsonify([notification.serialize() for notification in notifications]), 200
 
 # Run the application
 if __name__ == '__main__':
