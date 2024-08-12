@@ -2,21 +2,27 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
-from werkzeug.security import generate_password_hash, check_password_hash
+import bcrypt
 from models import db, User, Parcel, Admin, DeliveryHistory, Notification, ParcelType, Driver
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import os
+from flask_swagger_ui import get_swaggerui_blueprint
 from dotenv import load_dotenv
+
 load_dotenv()
+
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://sendit-phi.vercel.app/"}}) # Enable CORS to a specific origin
+CORS(app, resources={r"/*": {"origins": "https://sendit-fe-ten.vercel.app/"}})  
+
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'c1e587280cfa3822807fbfff64062177d1eb2c7e57fb6b02d121283a6d3ca6d6')
+jwt = JWTManager(app)
+
 @app.route('/api/data', methods=['GET'])
 def get_data():
-    return {'message': 'Hello, World!'}  
+    return {'message': 'Hello, World!'}
 
-from flask_swagger_ui import get_swaggerui_blueprint
-
-SWAGGER_URL="/swagger"
-API_URL="/static/swagger.json"
+SWAGGER_URL = '/api/docs'
+API_URL = "/static/swagger.json"
 
 swagger_ui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
@@ -27,30 +33,35 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 )
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
-# Configurations for SQLite
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
-# Initialize extensions
+
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# Utility Functions
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def check_password(hashed_password, plain_password):
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
 def authenticate_user(username, password):
     user = User.query.filter_by(username=username).first()
-    if user and check_password_hash(user.password, password):
+    if user and check_password(user.password, password):
         return user
     return None
 
-# Routes
+
 @app.route('/')
 def home():
     return "<h1>SendIT Courier Service</h1>"
 
 @app.route('/users', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def users():
     if request.method == 'GET':
         users = User.query.all()
@@ -58,7 +69,7 @@ def users():
     
     elif request.method == 'POST':
         data = request.get_json()
-        hashed_password = generate_password_hash(data['password'])
+        hashed_password = hash_password(data['password'])
         new_user = User(
             username=data['username'],
             email=data['email'],
@@ -71,6 +82,7 @@ def users():
 
 @app.route('/users/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def user_detail(id):
     user = User.query.get_or_404(id)
     if request.method == 'GET':
@@ -85,7 +97,7 @@ def user_detail(id):
         if 'phone' in data:
             user.phone = data['phone']
         if 'password' in data:
-            user.password = generate_password_hash(data['password'])
+            user.password = hash_password(data['password'])
         db.session.commit()
         return jsonify(user.serialize())
     
@@ -102,11 +114,13 @@ def user_login():
     password = data.get('password')
     user = authenticate_user(username, password)
     if user:
-        return jsonify({'message': 'Login successful'}), 200
+        access_token = create_access_token(identity=user.id)
+        return jsonify({'access_token': access_token}), 200
     return jsonify({'message': 'Invalid username or password'}), 401
 
 @app.route('/parcels', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def parcels():
     if request.method == 'GET':
         parcels = Parcel.query.all()
@@ -127,6 +141,7 @@ def parcels():
 
 @app.route('/parcels/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def parcel_detail(id):
     parcel = Parcel.query.get_or_404(id)
     if request.method == 'GET':
@@ -154,6 +169,7 @@ def parcel_detail(id):
 
 @app.route('/admins', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def admins():
     if request.method == 'GET':
         admins = Admin.query.all()
@@ -161,7 +177,7 @@ def admins():
     
     elif request.method == 'POST':
         data = request.get_json()
-        hashed_password = generate_password_hash(data['password'])
+        hashed_password = hash_password(data['password'])
         new_admin = Admin(
             username=data['username'],
             password=hashed_password,
@@ -173,6 +189,7 @@ def admins():
 
 @app.route('/admins/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def admin_detail(id):
     admin = Admin.query.get_or_404(id)
     if request.method == 'GET':
@@ -185,7 +202,7 @@ def admin_detail(id):
         if 'email' in data:
             admin.email = data['email']
         if 'password' in data:
-            admin.password = generate_password_hash(data['password'])
+            admin.password = hash_password(data['password'])
         db.session.commit()
         return jsonify(admin.serialize())
     
@@ -196,6 +213,7 @@ def admin_detail(id):
 
 @app.route('/delivery_histories', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def delivery_histories():
     if request.method == 'GET':
         histories = DeliveryHistory.query.all()
@@ -214,6 +232,7 @@ def delivery_histories():
 
 @app.route('/notifications', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def notifications():
     if request.method == 'GET':
         notifications = Notification.query.all()
@@ -232,6 +251,7 @@ def notifications():
 
 @app.route('/parcel_types', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def parcel_types():
     if request.method == 'GET':
         parcel_types = ParcelType.query.all()
@@ -249,6 +269,7 @@ def parcel_types():
 
 @app.route('/drivers', methods=['GET', 'POST'])
 @cross_origin()
+@jwt_required()  # Protect this route with JWT
 def drivers():
     if request.method == 'GET':
         drivers = Driver.query.all()
@@ -256,41 +277,14 @@ def drivers():
     
     elif request.method == 'POST':
         data = request.get_json()
-        hashed_password = generate_password_hash(data['password'])
         new_driver = Driver(
             name=data['name'],
-            license_number=data['license_number'],
             phone=data['phone'],
-            password=hashed_password
+            email=data['email']
         )
         db.session.add(new_driver)
         db.session.commit()
         return jsonify(new_driver.serialize()), 201
-
-@app.route('/drivers/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
-@cross_origin()
-def driver_detail(id):
-    driver = Driver.query.get_or_404(id)
-    if request.method == 'GET':
-        return jsonify(driver.serialize())
-    
-    elif request.method == 'PATCH':
-        data = request.get_json()
-        if 'name' in data:
-            driver.name = data['name']
-        if 'license_number' in data:
-            driver.license_number = data['license_number']
-        if 'phone' in data:
-            driver.phone = data['phone']
-        if 'password' in data:
-            driver.password = generate_password_hash(data['password'])
-        db.session.commit()
-        return jsonify(driver.serialize())
-    
-    elif request.method == 'DELETE':
-        db.session.delete(driver)
-        db.session.commit()
-        return '', 204
 
 if __name__ == '__main__':
     app.run(debug=True)
