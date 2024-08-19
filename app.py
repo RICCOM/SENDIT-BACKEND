@@ -1,6 +1,6 @@
 from models import User, Parcel, Admin, Driver
 from config import app, Resource, api, make_response, request, db
-
+from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, current_user, jwt_required, JWTManager
 
 
@@ -14,13 +14,10 @@ app.config["JWT_SECRET_KEY"] = "b'Y\xf1Xz\x01\xad|eQ\x80t \xca\x1a\x10K'"
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
 jwt = JWTManager(app)
 
-# Configure Flask Mail
-# app.config['MAIL_SERVER'] = 'smtp.example.com'
-# app.config['MAIL_PORT'] = 587
-# app.config['MAIL_USERNAME'] = 'your_email@example.com'
-# app.config['MAIL_PASSWORD'] = 'your_email_password'
-# app.config['MAIL_USE_TLS'] = True
-# app.config['MAIL_USE_SSL'] = False
+CORS(app, resources={r"/*": {"origins": [
+    "http://localhost:3000",
+    # "https://spacehub2.netlify.app"
+]}})
 mail = Mail(app)
 
 # Serializer for email verification
