@@ -1,0 +1,711 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SENDIT API",
+    "version": "1.0.0",
+    "description": "API documentation for the SENDIT courier service application."
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Get all users",
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/parcels": {
+      "get": {
+        "summary": "Get all parcels",
+        "responses": {
+          "200": {
+            "description": "A list of parcels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new parcel",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Parcel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Parcel created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Parcel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parcels/{id}": {
+      "get": {
+        "summary": "Get a parcel by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single parcel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Parcel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parcel not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a parcel by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Parcel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parcel updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Parcel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parcel not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a parcel by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Parcel deleted"
+          },
+          "404": {
+            "description": "Parcel not found"
+          }
+        }
+      }
+    },
+    "/admins": {
+      "get": {
+        "summary": "Get all admins",
+        "responses": {
+          "200": {
+            "description": "A list of admins",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new admin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Admin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admins/{id}": {
+      "get": {
+        "summary": "Get an admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Admin not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Admin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Admin updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Admin not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Admin deleted"
+          },
+          "404": {
+            "description": "Admin not found"
+          }
+        }
+      }
+    },
+    "/drivers": {
+      "get": {
+        "summary": "Get all drivers",
+        "responses": {
+          "200": {
+            "description": "A list of drivers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriverList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new driver",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Driver"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Driver created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Driver"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drivers/{id}": {
+      "get": {
+        "summary": "Get a driver by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single driver",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Driver"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a driver by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Driver"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Driver updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Driver"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a driver by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Driver deleted"
+          },
+          "404": {
+            "description": "Driver not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "john_doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "password_hash": {
+            "type": "string",
+            "example": "hashed_password"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "phone_number",
+          "password_hash"
+        ]
+      },
+      "UserList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/User"
+        }
+      },
+      "Parcel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "sender_address": {
+            "type": "string",
+            "example": "123 Sender St"
+          },
+          "receiver_address": {
+            "type": "string",
+            "example": "456 Receiver Rd"
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "example": 2.5
+          },
+          "cost_per_kg": {
+            "type": "number",
+            "format": "float",
+            "example": 10.0
+          },
+          "status": {
+            "type": "string",
+            "example": "Pending"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-08-15T12:34:56Z"
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "driver_id": {
+            "type": "integer",
+            "example": 2
+          }
+        },
+        "required": [
+          "sender_address",
+          "receiver_address",
+          "weight",
+          "cost_per_kg",
+          "status"
+        ]
+      },
+      "ParcelList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Parcel"
+        }
+      },
+      "Admin": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "admin_user"
+          },
+          "email": {
+            "type": "string",
+            "example": "admin@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+0987654321"
+          },
+          "password_hash": {
+            "type": "string",
+            "example": "hashed_password"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "phone_number",
+          "password_hash"
+        ]
+      },
+      "AdminList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Admin"
+        }
+      },
+      "Driver": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "driver_user"
+          },
+          "email": {
+            "type": "string",
+            "example": "driver@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+1122334455"
+          },
+          "vehicle_type": {
+            "type": "string",
+            "example": "Van"
+          },
+          "password_hash": {
+            "type": "string",
+            "example": "hashed_password"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "phone_number",
+          "vehicle_type",
+          "password_hash"
+        ]
+      },
+      "DriverList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Driver"
+        }
+      }
+    }
+  }
+}
