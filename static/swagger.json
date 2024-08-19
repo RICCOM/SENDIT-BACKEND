@@ -1,965 +1,711 @@
 {
-    "openapi": "3.0.3",
-    "info": {
-      "title": "SendIT Courier Service API",
-      "description": "API for managing users, parcels, and other entities in SendIT Courier Service",
-      "version": "1.0.0"
-    },
-    "servers": [
-      {
-        "url": "http://127.0.0.1:5000/",
-        "description": "Development server"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SENDIT API",
+    "version": "1.0.0",
+    "description": "API documentation for the SENDIT courier service application."
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Get all users",
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserList"
+                }
+              }
+            }
+          }
+        }
       },
-      {
-        "url":"https://sendit-phi.vercel.app/",
-        "description":"Production server"
+      "post": {
+        "summary": "Create a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
       }
-    ],
-    "paths": {
-      "/": {
-        "get": {
-          "summary": "Home",
-          "description": "Home page",
-          "responses": {
-            "200": {
-              "description": "Welcome message",
-              "content": {
-                "text/html": {
-                  "schema": {
-                    "type": "string",
-                    "example": "<h1>SendIT Courier Service</h1>"
-                  }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/parcels": {
+      "get": {
+        "summary": "Get all parcels",
+        "responses": {
+          "200": {
+            "description": "A list of parcels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelList"
                 }
               }
             }
           }
         }
       },
-      "/users": {
-        "get": {
-          "summary": "Get all users",
-          "description": "Retrieves a list of all users",
-          "responses": {
-            "200": {
-              "description": "A list of users",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 1 },
-                        "username": { "type": "string", "example": "john_doe" },
-                        "email": { "type": "string", "example": "john@example.com" },
-                        "phone": { "type": "string", "example": "1234567890" }
-                      }
-                    }
-                  }
-                }
+      "post": {
+        "summary": "Create a new parcel",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Parcel"
               }
             }
           }
         },
-        "post": {
-          "summary": "Create a new user",
-          "description": "Registers a new user",
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "201": {
+            "description": "Parcel created",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "username": { "type": "string", "example": "john_doe" },
-                    "email": { "type": "string", "example": "john@example.com" },
-                    "password": { "type": "string", "example": "password123" },
-                    "phone": { "type": "string", "example": "1234567890" }
-                  },
-                  "required": ["username", "email", "password"]
+                  "$ref": "#/components/schemas/Parcel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parcels/{id}": {
+      "get": {
+        "summary": "Get a parcel by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single parcel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Parcel"
                 }
               }
             }
           },
-          "responses": {
-            "201": {
-              "description": "User successfully registered",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "username": { "type": "string", "example": "john_doe" },
-                      "email": { "type": "string", "example": "john@example.com" },
-                      "phone": { "type": "string", "example": "1234567890" }
-                    }
-                  }
+          "404": {
+            "description": "Parcel not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a parcel by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Parcel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parcel updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Parcel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parcel not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a parcel by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Parcel deleted"
+          },
+          "404": {
+            "description": "Parcel not found"
+          }
+        }
+      }
+    },
+    "/admins": {
+      "get": {
+        "summary": "Get all admins",
+        "responses": {
+          "200": {
+            "description": "A list of admins",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminList"
                 }
               }
             }
           }
         }
       },
-      "/users/{id}": {
-        "get": {
-          "summary": "Get user details",
-          "description": "Retrieves details of a specific user by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
+      "post": {
+        "summary": "Create a new admin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
               "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "User details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "username": { "type": "string", "example": "john_doe" },
-                      "email": { "type": "string", "example": "john@example.com" },
-                      "phone": { "type": "string", "example": "1234567890" }
-                    }
-                  }
-                }
+                "$ref": "#/components/schemas/Admin"
               }
             }
           }
         },
-        "patch": {
-          "summary": "Update user details",
-          "description": "Updates details of a specific user by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "201": {
+            "description": "Admin created",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "username": { "type": "string", "example": "john_doe" },
-                    "email": { "type": "string", "example": "john@example.com" },
-                    "phone": { "type": "string", "example": "1234567890" },
-                    "password": { "type": "string", "example": "newpassword123" }
-                  }
+                  "$ref": "#/components/schemas/Admin"
                 }
               }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "User details updated",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "username": { "type": "string", "example": "john_doe" },
-                      "email": { "type": "string", "example": "john@example.com" },
-                      "phone": { "type": "string", "example": "1234567890" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "delete": {
-          "summary": "Delete user",
-          "description": "Deletes a specific user by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "User deleted"
             }
           }
         }
-      },
-      "/users/login": {
-        "post": {
-          "summary": "User login",
-          "description": "Logs a user into the system",
-          "requestBody": {
+      }
+    },
+    "/admins/{id}": {
+      "get": {
+        "summary": "Get an admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
             "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single admin",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "username": { "type": "string", "example": "john_doe" },
-                    "password": { "type": "string", "example": "password123" }
-                  },
-                  "required": ["username", "password"]
+                  "$ref": "#/components/schemas/Admin"
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Login successful",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": { "type": "string", "example": "Login successful" }
-                    }
-                  }
+          "404": {
+            "description": "Admin not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Admin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Admin updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
                 }
               }
-            },
-            "401": {
-              "description": "Invalid username or password",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": { "type": "string", "example": "Invalid username or password" }
-                    }
-                  }
+            }
+          },
+          "404": {
+            "description": "Admin not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an admin by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Admin deleted"
+          },
+          "404": {
+            "description": "Admin not found"
+          }
+        }
+      }
+    },
+    "/drivers": {
+      "get": {
+        "summary": "Get all drivers",
+        "responses": {
+          "200": {
+            "description": "A list of drivers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriverList"
                 }
               }
             }
           }
         }
       },
-      "/parcels": {
-        "get": {
-          "summary": "Get all parcels",
-          "description": "Retrieves a list of all parcels",
-          "responses": {
-            "200": {
-              "description": "A list of parcels",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 1 },
-                        "sender": { "type": "string", "example": "Alice" },
-                        "receiver": { "type": "string", "example": "Bob" },
-                        "weight": { "type": "number", "example": 2.5 },
-                        "dimensions": { "type": "string", "example": "30x30x30" },
-                        "status": { "type": "string", "example": "In transit" }
-                      }
-                    }
-                  }
-                }
+      "post": {
+        "summary": "Create a new driver",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Driver"
               }
             }
           }
         },
-        "post": {
-          "summary": "Create a new parcel",
-          "description": "Registers a new parcel",
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "201": {
+            "description": "Driver created",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "sender": { "type": "string", "example": "Alice" },
-                    "receiver": { "type": "string", "example": "Bob" },
-                    "weight": { "type": "number", "example": 2.5 },
-                    "dimensions": { "type": "string", "example": "30x30x30" },
-                    "status": { "type": "string", "example": "In transit" }
-                  },
-                  "required": ["sender", "receiver", "weight", "dimensions", "status"]
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Parcel successfully registered",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "sender": { "type": "string", "example": "Alice" },
-                      "receiver": { "type": "string", "example": "Bob" },
-                      "weight": { "type": "number", "example": 2.5 },
-                      "dimensions": { "type": "string", "example": "30x30x30" },
-                      "status": { "type": "string", "example": "In transit" }
-                    }
-                  }
+                  "$ref": "#/components/schemas/Driver"
                 }
               }
             }
           }
         }
-      },
-      "/parcels/{id}": {
-        "get": {
-          "summary": "Get parcel details",
-          "description": "Retrieves details of a specific parcel by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Parcel details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "sender": { "type": "string", "example": "Alice" },
-                      "receiver": { "type": "string", "example": "Bob" },
-                      "weight": { "type": "number", "example": 2.5 },
-                      "dimensions": { "type": "string", "example": "30x30x30" },
-                      "status": { "type": "string", "example": "In transit" }
-                    }
-                  }
-                }
-              }
+      }
+    },
+    "/drivers/{id}": {
+      "get": {
+        "summary": "Get a driver by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
-        "patch": {
-          "summary": "Update parcel details",
-          "description": "Updates details of a specific parcel by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
+        ],
+        "responses": {
+          "200": {
+            "description": "A single driver",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "sender": { "type": "string", "example": "Alice" },
-                    "receiver": { "type": "string", "example": "Bob" },
-                    "weight": { "type": "number", "example": 2.5 },
-                    "dimensions": { "type": "string", "example": "30x30x30" },
-                    "status": { "type": "string", "example": "In transit" }
-                  }
+                  "$ref": "#/components/schemas/Driver"
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Parcel details updated",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "sender": { "type": "string", "example": "Alice" },
-                      "receiver": { "type": "string", "example": "Bob" },
-                      "weight": { "type": "number", "example": 2.5 },
-                      "dimensions": { "type": "string", "example": "30x30x30" },
-                      "status": { "type": "string", "example": "In transit" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "delete": {
-          "summary": "Delete parcel",
-          "description": "Deletes a specific parcel by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Parcel deleted"
-            }
+          "404": {
+            "description": "Driver not found"
           }
         }
       },
-      "/admins": {
-        "get": {
-          "summary": "Get all admins",
-          "description": "Retrieves a list of all admins",
-          "responses": {
-            "200": {
-              "description": "A list of admins",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 1 },
-                        "username": { "type": "string", "example": "admin_user" },
-                        "email": { "type": "string", "example": "admin@example.com" }
-                      }
-                    }
-                  }
-                }
+      "put": {
+        "summary": "Update a driver by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Driver"
               }
             }
           }
         },
-        "post": {
-          "summary": "Create a new admin",
-          "description": "Registers a new admin",
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "200": {
+            "description": "Driver updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "username": { "type": "string", "example": "admin_user" },
-                    "email": { "type": "string", "example": "admin@example.com" },
-                    "password": { "type": "string", "example": "password123" }
-                  },
-                  "required": ["username", "email", "password"]
+                  "$ref": "#/components/schemas/Driver"
                 }
               }
             }
           },
-          "responses": {
-            "201": {
-              "description": "Admin successfully registered",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "username": { "type": "string", "example": "admin_user" },
-                      "email": { "type": "string", "example": "admin@example.com" }
-                    }
-                  }
-                }
-              }
-            }
+          "404": {
+            "description": "Driver not found"
           }
         }
       },
-      "/admins/{id}": {
-        "get": {
-          "summary": "Get admin details",
-          "description": "Retrieves details of a specific admin by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Admin details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "username": { "type": "string", "example": "admin_user" },
-                      "email": { "type": "string", "example": "admin@example.com" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "patch": {
-          "summary": "Update admin details",
-          "description": "Updates details of a specific admin by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "requestBody": {
+      "delete": {
+        "summary": "Delete a driver by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
             "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "username": { "type": "string", "example": "admin_user" },
-                    "email": { "type": "string", "example": "admin@example.com" },
-                    "password": { "type": "string", "example": "newpassword123" }
-                  }
-                }
-              }
+            "schema": {
+              "type": "integer"
             }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Driver deleted"
           },
-          "responses": {
-            "200": {
-              "description": "Admin details updated",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "username": { "type": "string", "example": "admin_user" },
-                      "email": { "type": "string", "example": "admin@example.com" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "delete": {
-          "summary": "Delete admin",
-          "description": "Deletes a specific admin by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Admin deleted"
-            }
-          }
-        }
-      },
-      "/delivery_histories": {
-        "get": {
-          "summary": "Get all delivery histories",
-          "description": "Retrieves a list of all delivery histories",
-          "responses": {
-            "200": {
-              "description": "A list of delivery histories",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 1 },
-                        "parcel_id": { "type": "integer", "example": 123 },
-                        "driver_id": { "type": "integer", "example": 1 },
-                        "delivered_at": { "type": "string", "example": "2023-01-01T00:00:00Z" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Create a new delivery history",
-          "description": "Registers a new delivery history",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "parcel_id": { "type": "integer", "example": 123 },
-                    "driver_id": { "type": "integer", "example": 1 },
-                    "delivered_at": { "type": "string", "example": "2023-01-01T00:00:00Z" }
-                  },
-                  "required": ["parcel_id", "driver_id", "delivered_at"]
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Delivery history successfully registered",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "parcel_id": { "type": "integer", "example": 123 },
-                      "driver_id": { "type": "integer", "example": 1 },
-                      "delivered_at": { "type": "string", "example": "2023-01-01T00:00:00Z" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/notifications": {
-        "get": {
-          "summary": "Get all notifications",
-          "description": "Retrieves a list of all notifications",
-          "responses": {
-            "200": {
-              "description": "A list of notifications",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 1 },
-                        "message": { "type": "string", "example": "New delivery available" },
-                        "user_id": { "type": "integer", "example": 1 },
-                        "created_at": { "type": "string", "example": "2023-01-01T00:00:00Z" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Create a new notification",
-          "description": "Registers a new notification",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": { "type": "string", "example": "New delivery available" },
-                    "user_id": { "type": "integer", "example": 1 },
-                    "created_at": { "type": "string", "example": "2023-01-01T00:00:00Z" }
-                  },
-                  "required": ["message", "user_id"]
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Notification successfully registered",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "message": { "type": "string", "example": "New delivery available" },
-                      "user_id": { "type": "integer", "example": 1 },
-                      "created_at": { "type": "string", "example": "2023-01-01T00:00:00Z" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/parcel_types": {
-        "get": {
-          "summary": "Get all parcel types",
-          "description": "Retrieves a list of all parcel types",
-          "responses": {
-            "200": {
-              "description": "A list of parcel types",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 1 },
-                        "name": { "type": "string", "example": "Small Package" },
-                        "description": { "type": "string", "example": "A small package" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Create a new parcel type",
-          "description": "Registers a new parcel type",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": { "type": "string", "example": "Small Package" },
-                    "description": { "type": "string", "example": "A small package" }
-                  },
-                  "required": ["name"]
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Parcel type successfully registered",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "name": { "type": "string", "example": "Small Package" },
-                      "description": { "type": "string", "example": "A small package" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/drivers": {
-        "get": {
-          "summary": "Get all drivers",
-          "description": "Retrieves a list of all drivers",
-          "responses": {
-            "200": {
-              "description": "A list of drivers",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 1 },
-                        "name": { "type": "string", "example": "John Doe" },
-                        "license_number": { "type": "string", "example": "AB12345" },
-                        "phone": { "type": "string", "example": "1234567890" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Create a new driver",
-          "description": "Registers a new driver",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": { "type": "string", "example": "John Doe" },
-                    "license_number": { "type": "string", "example": "AB12345" },
-                    "phone": { "type": "string", "example": "1234567890" },
-                    "password": { "type": "string", "example": "password123" }
-                  },
-                  "required": ["name", "license_number", "phone", "password"]
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Driver successfully registered",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "name": { "type": "string", "example": "John Doe" },
-                      "license_number": { "type": "string", "example": "AB12345" },
-                      "phone": { "type": "string", "example": "1234567890" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/drivers/{id}": {
-        "get": {
-          "summary": "Get driver details",
-          "description": "Retrieves details of a specific driver by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Driver details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "name": { "type": "string", "example": "John Doe" },
-                      "license_number": { "type": "string", "example": "AB12345" },
-                      "phone": { "type": "string", "example": "1234567890" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "patch": {
-          "summary": "Update driver details",
-          "description": "Updates details of a specific driver by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": { "type": "string", "example": "John Doe" },
-                    "license_number": { "type": "string", "example": "AB12345" },
-                    "phone": { "type": "string", "example": "1234567890" },
-                    "password": { "type": "string", "example": "newpassword123" }
-                  }
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Driver details updated",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 1 },
-                      "name": { "type": "string", "example": "John Doe" },
-                      "license_number": { "type": "string", "example": "AB12345" },
-                      "phone": { "type": "string", "example": "1234567890" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "delete": {
-          "summary": "Delete driver",
-          "description": "Deletes a specific driver by ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer",
-                "example": 1
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Driver deleted"
-            }
+          "404": {
+            "description": "Driver not found"
           }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "john_doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "password_hash": {
+            "type": "string",
+            "example": "hashed_password"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "phone_number",
+          "password_hash"
+        ]
+      },
+      "UserList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/User"
+        }
+      },
+      "Parcel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "sender_address": {
+            "type": "string",
+            "example": "123 Sender St"
+          },
+          "receiver_address": {
+            "type": "string",
+            "example": "456 Receiver Rd"
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "example": 2.5
+          },
+          "cost_per_kg": {
+            "type": "number",
+            "format": "float",
+            "example": 10.0
+          },
+          "status": {
+            "type": "string",
+            "example": "Pending"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-08-15T12:34:56Z"
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "driver_id": {
+            "type": "integer",
+            "example": 2
+          }
+        },
+        "required": [
+          "sender_address",
+          "receiver_address",
+          "weight",
+          "cost_per_kg",
+          "status"
+        ]
+      },
+      "ParcelList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Parcel"
+        }
+      },
+      "Admin": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "admin_user"
+          },
+          "email": {
+            "type": "string",
+            "example": "admin@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+0987654321"
+          },
+          "password_hash": {
+            "type": "string",
+            "example": "hashed_password"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "phone_number",
+          "password_hash"
+        ]
+      },
+      "AdminList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Admin"
+        }
+      },
+      "Driver": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "driver_user"
+          },
+          "email": {
+            "type": "string",
+            "example": "driver@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+1122334455"
+          },
+          "vehicle_type": {
+            "type": "string",
+            "example": "Van"
+          },
+          "password_hash": {
+            "type": "string",
+            "example": "hashed_password"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "phone_number",
+          "vehicle_type",
+          "password_hash"
+        ]
+      },
+      "DriverList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Driver"
+        }
+      }
+    }
   }
-  
+}
